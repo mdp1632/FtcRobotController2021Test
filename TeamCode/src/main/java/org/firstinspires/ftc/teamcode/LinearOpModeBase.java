@@ -63,6 +63,8 @@ public class LinearOpModeBase extends LinearOpMode {
         return;
     }
 
+    //controller map
+
     public boolean visionButton(){
         return gamepad1.a;
     }
