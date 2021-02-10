@@ -29,12 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -56,10 +56,13 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFront = null;
+    private DcMotorSimple leftFront = null;
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
+    private DcMotor shooterMotor = null;
+    private Servo intakeServo = null;
+
 
 
     @Override
@@ -70,10 +73,13 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        leftFront  = hardwareMap.get(DcMotor.class, "lf_drive");
+        leftFront  = hardwareMap.get(DcMotorSimple.class, "lf_drive");
         rightFront = hardwareMap.get(DcMotor.class, "rf_drive");
         leftBack  = hardwareMap.get(DcMotor.class, "lb_drive");
         rightBack = hardwareMap.get(DcMotor.class, "rb_drive");
+        shooterMotor = hardwareMap.get(DcMotor.class, "shooter_motor");
+        intakeServo = hardwareMap.get(Servo.class, "intake_servo");
+
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -88,6 +94,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            
 
             // Setup a variable for each drive wheel to save power level for telemetry
             double leftPower;
@@ -105,8 +112,9 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             */
             // Tank Mode uses one stick to control each wheel.
             // - This requires no math, but it is hard to drive forward slowly and keep straight.
-             leftPower  = -gamepad1.left_stick_y ;
-             rightPower = -gamepad1.right_stick_y ;
+
+             leftPower = left_sticky_y();
+             rightPower = right_sticky_y();
 
             // Send calculated power to wheels
             rightFront.setPower(rightPower);
@@ -121,4 +129,34 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             telemetry.update();
         }
     }
+
+    //CONTROLLER MAP
+
+    public double left_sticky_y(){
+        return -gamepad1.left_stick_y;
+    }
+
+    public double right_sticky_y() {
+        return -gamepad1.right_stick_y;
+    }
+
+    public boolean shootButton(){
+        if((gamepad1.right_trigger>.5)||(gamepad2.right_trigger>.5)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean intakeButton(){
+        if((gamepad1.left_trigger>.5)||(gamepad2.left_trigger>.5)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+
 }
