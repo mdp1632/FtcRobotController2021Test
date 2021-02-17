@@ -64,7 +64,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     private DcMotor rightBack = null;
     private DcMotorEx shooterMotor = null;   //DcMotorEx offers extended capabilities such as setVelocity()
     private Servo intakeServo = null;
-
+    private Servo ShooterFlipper = null;
 
 
     @Override
@@ -81,8 +81,10 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "rb_drive");
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter_motor");
         intakeServo = hardwareMap.get(Servo.class, "intake_servo");
+        ShooterFlipper = hardwareMap.get(Servo.class,"ShooterFlipper_servo");
 
-        //Set Motor Directions
+
+                //Set Motor Directions
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
@@ -90,6 +92,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         intakeServo.setDirection(Servo.Direction.FORWARD);
+        ShooterFlipper.setDirection(Servo.Direction.FORWARD);
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //BRAKE or FLOAT (Coast)
@@ -130,6 +133,15 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     public boolean shootButton(){
         if((gamepad1.right_trigger>.5)||(gamepad2.right_trigger>.5)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean ShooterStartButton(){
+        if(gamepad1.right_bumper||gamepad2.right_bumper){
             return true;
         }
         else{
@@ -190,14 +202,24 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         }
     }
 
+
     public void shooter(){
-        if(shootButton()){
+        if(ShooterStartButton()){
             double speed = 1;
             shooterMotor.setPower(speed);
-        }else{
+            if(shootButton()){
+                double shootPosition = .5;
+                intakeServo.setPosition(shootPosition);
+            }
+        }
+        else{
             shooterMotor.setPower(0);}
     }
 
+    //TODO: set servo to neutral position when bumper is released
+
+
 }
+
 
 

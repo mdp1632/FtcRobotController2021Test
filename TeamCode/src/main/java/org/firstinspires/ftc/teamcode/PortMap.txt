@@ -1,0 +1,13 @@
+Motor Ports
+    0   Shooter Motor
+    1   RF Motor
+    2   LB Motor
+    3   RB Motor
+
+Servo Ports
+    0   LF - SPARK Mini
+    1   Intake Servo
+    2   Wobble Lift Servo
+    3   Wobble Claw Servo
+    4   Shooter Flipper Servo
+    5   Intake Latch
