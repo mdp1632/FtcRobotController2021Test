@@ -213,7 +213,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             }
         }
         else{
-            shooterMotor.setPower(0);}
+            shooterMotor.setPower(0);
+        }
     }
 
     //TODO: set servo to neutral position when bumper is released
