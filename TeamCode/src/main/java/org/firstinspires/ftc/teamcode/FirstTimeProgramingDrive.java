@@ -35,7 +35,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.configuration.ServoFlavor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -64,8 +63,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     private DcMotor rightBack = null;
     private DcMotorEx shooterMotor = null;   //DcMotorEx offers extended capabilities such as setVelocity()
     private Servo intakeServo = null;
-    private Servo ShooterFlipper = null;
-
+    private Servo shooterFlipper = null;
+    private Servo intakeLatch = null;
 
     @Override
     public void runOpMode() {
@@ -81,8 +80,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         rightBack = hardwareMap.get(DcMotor.class, "rb_drive");
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter_motor");
         intakeServo = hardwareMap.get(Servo.class, "intake_servo");
-        ShooterFlipper = hardwareMap.get(Servo.class,"ShooterFlipper_servo");
-
+        shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper_servo");
+        intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
 
                 //Set Motor Directions
         leftFront.setDirection(DcMotor.Direction.FORWARD);
@@ -92,7 +91,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
         intakeServo.setDirection(Servo.Direction.FORWARD);
-        ShooterFlipper.setDirection(Servo.Direction.FORWARD);
+        shooterFlipper.setDirection(Servo.Direction.FORWARD);
+        intakeLatch.setDirection(Servo.Direction.FORWARD);
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //BRAKE or FLOAT (Coast)
@@ -108,6 +108,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+        releaseLatch();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -190,7 +191,16 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
         // Show the elapsed game time.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        }
+    }
+
+    public void holonomicDrive(){
+        double robotSpeed;
+        double angle;
+        double rotationSpeed;
+
+        //TODO: FINISH HOLONOMIC CODE
+
+    }
 
     public void intake(){
         if(intakeButton()){
@@ -204,12 +214,16 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
 
     public void shooter(){
+        double shootPosition = .5;
+        double neutral = 0;
+        double speed = 1;
+
         if(ShooterStartButton()){
-            double speed = 1;
             shooterMotor.setPower(speed);
             if(shootButton()){
-                double shootPosition = .5;
-                intakeServo.setPosition(shootPosition);
+                shooterFlipper.setPosition(shootPosition);
+            }
+           else { shooterFlipper.setPosition(neutral);
             }
         }
         else{
@@ -217,7 +231,13 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         }
     }
 
-    //TODO: set servo to neutral position when bumper is released
+    public void releaseLatch(){
+        double releaseLatchPosition = .5;
+
+        intakeLatch.setPosition(releaseLatchPosition);
+
+    }
+
 
 
 }
