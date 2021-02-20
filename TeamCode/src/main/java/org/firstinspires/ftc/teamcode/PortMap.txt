@@ -1,13 +1,13 @@
-Motor Ports
-    0   Shooter Motor
-    1   RF Motor
-    2   LB Motor
-    3   RB Motor
+Motor Ports                    Configuration Names
+    0   Shooter Motor          shooter_motor
+    1   RF Motor               rf_drive
+    2   LB Motor               lb_drive
+    3   RB Motor               rb_drive
 
 Servo Ports
-    0   LF - SPARK Mini
-    1   Intake Servo
+    0   LF - SPARK Mini        lf_drive
+    1   Intake Servo           intake_servo
     2   Wobble Lift Servo
     3   Wobble Claw Servo
-    4   Shooter Flipper Servo
-    5   Intake Latch
+    4   Shooter Flipper Servo  shooterFlipper_servo
+    5   Intake Latch Servo     intakeLatch_servo
