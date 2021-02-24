@@ -57,7 +57,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotorSimple leftFront = null;
+    private DcMotorSimple leftFront = null; //DcMotorSimple because it is connected to SPARK Mini
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
@@ -83,25 +83,22 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper_servo");
         intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
 
-                //Set Motor Directions
+        //Set Motor  and servo Directions
         leftFront.setDirection(DcMotor.Direction.FORWARD);
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         leftBack.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.REVERSE);
 
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
+
         intakeServo.setDirection(Servo.Direction.FORWARD);
         shooterFlipper.setDirection(Servo.Direction.FORWARD);
         intakeLatch.setDirection(Servo.Direction.FORWARD);
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //BRAKE or FLOAT (Coast)
-
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-
-
 
 
 
@@ -132,6 +129,15 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         return -gamepad1.right_stick_y;
     }
 
+    public double left_sticky_x(){
+        return gamepad1.left_stick_x;
+    }
+
+    public double right_sticky_x() {
+        return gamepad1.right_stick_x;
+    }
+
+
     public boolean shootButton(){
         if((gamepad1.right_trigger>.5)||(gamepad2.right_trigger>.5)){
             return true;
@@ -160,6 +166,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     }
 
 
+
+    //Drive Methods
 
     public void tankdrive(){
         // Setup a variable for each drive wheel to save power level for telemetry
@@ -195,12 +203,41 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     public void holonomicDrive(){
         double robotSpeed;
-        double angle;
+        double movementAngle;
         double rotationSpeed;
 
-        //TODO: FINISH HOLONOMIC CODE
 
+        rotationSpeed = right_sticky_x()*.75;
+        robotSpeed = Math.hypot(left_sticky_y(), left_sticky_x());
+        movementAngle = Math.atan2(left_sticky_y(), left_sticky_x());
+
+        double leftFrontSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) + rotationSpeed;
+        double rightFrontSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) - rotationSpeed;
+        double leftBackSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) + rotationSpeed;
+        double rightBackSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) - rotationSpeed;
+
+        leftFront.setPower(leftFrontSpeed);
+        rightFront.setPower(rightFrontSpeed);
+        leftBack.setPower(leftBackSpeed);
+        rightBack.setPower(rightBackSpeed);
     }
+
+
+    public void holonomicDriveAuto(double robotSpeed, double movementAngle, double rotationSpeed){
+
+        double leftFrontSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) + rotationSpeed;
+        double rightFrontSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) - rotationSpeed;
+        double leftBackSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) + rotationSpeed;
+        double rightBackSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) - rotationSpeed;
+
+        leftFront.setPower(leftFrontSpeed);
+        rightFront.setPower(rightFrontSpeed);
+        leftBack.setPower(leftBackSpeed);
+        rightBack.setPower(rightBackSpeed);
+    }
+
+
+    //More Methods (Functions)
 
     public void intake(){
         if(intakeButton()){
@@ -211,7 +248,6 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             intakeServo.setPosition(0);
         }
     }
-
 
     public void shooter(){
         double shootPosition = .5;
@@ -238,7 +274,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     }
 
-
+    //TODO: Additional intake wheels?, Wobble goal picker-upper thing, odometry/encoders, emergency stop
 
 }
 
