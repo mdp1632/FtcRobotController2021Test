@@ -112,6 +112,9 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             tankdrive();
             intake();
             shooter();
+            if(emergencyStop()){
+                break;
+            }
 
             telemetry.update();
         }
@@ -120,6 +123,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
 
     //CONTROLLER MAP
+    //Thumbsticks
 
     public double left_sticky_y(){
         return -gamepad1.left_stick_y;
@@ -137,6 +141,23 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         return gamepad1.right_stick_x;
     }
 
+    //Buttons
+
+    public boolean emergencyButtons(){
+        if(((gamepad1.y)&&(gamepad1.b))||((gamepad2.y)&&(gamepad2.b))){
+            return true; }
+        else {
+            return false;
+        }
+    }
+
+    public boolean clawButton(){
+        return gamepad1.x;
+    }
+
+    public boolean liftButton(){
+        return gamepad1.a;
+    }
 
     public boolean shootButton(){
         if((gamepad1.right_trigger>.5)||(gamepad2.right_trigger>.5)){
@@ -236,6 +257,30 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         rightBack.setPower(rightBackSpeed);
     }
 
+    public boolean emergencyStop(){
+        if (emergencyButtons()) {
+            leftFront.setPower(0);
+            rightFront.setPower(0);
+            leftBack.setPower(0);
+            rightBack.setPower(0);
+            intakeServo.setPosition(0);
+            shooterMotor.setPower(0);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    public void claw(){
+        double in = 0;
+        double out = 1;
+        boolean clawChange=false;
+
+        if(clawChange){
+            //set claw position to in
+        }
+    }
 
     //More Methods (Functions)
 
@@ -274,7 +319,9 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     }
 
-    //TODO: Additional intake wheels?, Wobble goal picker-upper thing, odometry/encoders, emergency stop
+    //TODO:
+    // Wobble goal picker-upper thing - Need to add claw and lift servos to setup code
+    // Additional intake wheels?, odometry/encoders
 
 }
 
