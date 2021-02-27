@@ -53,6 +53,8 @@ public class EasyOpenCVCopy extends LinearOpModeBase //originally LinearOpMode; 
     //toggle Test Stuff
     boolean toggleState = false;
     Toggle toggleX = new Toggle();
+    
+    
 
     @Override
     public void runOpMode()

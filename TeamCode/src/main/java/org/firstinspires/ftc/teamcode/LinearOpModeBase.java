@@ -74,6 +74,14 @@ public class LinearOpModeBase extends LinearOpMode {
         return gamepad1.right_stick_x*scalingFactor;
     }
 
+    public double robotMecanumSpeed(){
+        double scalingFactor = 1;
+        double speed;
+        //put some code here for stick magnitude
+        return speed;
+    }
+
+
 
 
 }
