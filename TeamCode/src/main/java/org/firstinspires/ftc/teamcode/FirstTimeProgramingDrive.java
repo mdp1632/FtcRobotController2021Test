@@ -65,6 +65,11 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     private Servo intakeServo = null;
     private Servo shooterFlipper = null;
     private Servo intakeLatch = null;
+    private Servo wobbleClaw = null;
+    private Servo wobbleLift = null;
+
+    Toggle toggleClaw = new Toggle();
+    Toggle toggleLift = new Toggle();
 
     @Override
     public void runOpMode() {
@@ -82,6 +87,9 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         intakeServo = hardwareMap.get(Servo.class, "intake_servo");
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper_servo");
         intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
+        wobbleClaw = hardwareMap.get(Servo.class, "wobble_claw");
+        wobbleLift = hardwareMap.get(Servo.class, "wobble_lift");
+
 
         //Set Motor  and servo Directions
         leftFront.setDirection(DcMotor.Direction.FORWARD);
@@ -94,6 +102,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         intakeServo.setDirection(Servo.Direction.FORWARD);
         shooterFlipper.setDirection(Servo.Direction.FORWARD);
         intakeLatch.setDirection(Servo.Direction.FORWARD);
+        wobbleClaw.setDirection(Servo.Direction.FORWARD);
+        wobbleLift.setDirection(Servo.Direction.FORWARD);
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //BRAKE or FLOAT (Coast)
@@ -272,17 +282,31 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         }
     }
 
-    public void claw(){
+    public void claw() {
         double in = 0;
         double out = 1;
-        boolean clawChange=false;
+        boolean clawClose = toggleClaw.toggleButton(clawButton());
 
-        if(clawChange){
-            //set claw position to in
+        if (clawClose) {
+            wobbleClaw.setPosition(in);
+        } else {
+            wobbleClaw.setPosition(out);
         }
     }
 
-    //More Methods (Functions)
+    public void lift() {
+        double down = 0;
+        double up = 1;
+        boolean liftDown = toggleLift.toggleButton(liftButton());
+
+        if (liftDown) {
+            wobbleLift.setPosition(down);
+        } else {
+            wobbleLift.setPosition(up);
+        }
+    }
+
+            //More Methods (Functions)
 
     public void intake(){
         if(intakeButton()){
