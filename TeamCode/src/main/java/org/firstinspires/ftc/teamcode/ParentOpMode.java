@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -52,11 +53,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Basic: Drive", group="Linear Opmode")
-//@Disabled
-public class FirstTimeProgramingDrive extends LinearOpMode {
+@Disabled
+public class ParentOpMode extends LinearOpMode {
+
+
 
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime runtime = new ElapsedTime();
     private DcMotorSimple leftFront = null; //DcMotorSimple because it is connected to SPARK Mini
     private DcMotor leftBack = null;
     private DcMotor rightFront = null;
@@ -71,11 +74,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     Toggle toggleClaw = new Toggle();
     Toggle toggleLift = new Toggle();
 
-    @Override
-    public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
+    public void initialize(){
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
@@ -110,7 +109,14 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+    }
 
+    @Override
+    public void runOpMode() {
+
+        initialize();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -129,7 +135,6 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
             telemetry.update();
         }
     }
-
 
 
     //CONTROLLER MAP
@@ -267,6 +272,13 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         rightBack.setPower(rightBackSpeed);
     }
 
+    public void StopDrive(){
+        leftFront.setPower(0);
+        rightFront.setPower(0);
+        leftBack.setPower(0);
+        rightBack.setPower(0);
+    }
+
     public boolean emergencyStop(){
         if (emergencyButtons()) {
             leftFront.setPower(0);
@@ -282,9 +294,13 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         }
     }
 
+
+    //More Methods (Functions)
+
+    //Servo position is based on the assumption that servos have 200 degree range
     public void claw() {
-        double in = 0;
-        double out = 1;
+        double in = .45;
+        double out = 0;
         boolean clawClose = toggleClaw.toggleButton(clawButton());
 
         if (clawClose) {
@@ -296,7 +312,7 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
 
     public void lift() {
         double down = 0;
-        double up = 1;
+        double up = .90;
         boolean liftDown = toggleLift.toggleButton(liftButton());
 
         if (liftDown) {
@@ -306,7 +322,6 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
         }
     }
 
-            //More Methods (Functions)
 
     public void intake(){
         if(intakeButton()){
@@ -344,8 +359,8 @@ public class FirstTimeProgramingDrive extends LinearOpMode {
     }
 
     //TODO:
-    // Wobble goal picker-upper thing - Need to add claw and lift servos to setup code
     // Additional intake wheels?, odometry/encoders
+    // Create opmodes for multiple drive types, convert FirstTimeProgrammingDrive to base class
 
 }
 

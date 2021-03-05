@@ -7,7 +7,7 @@ Motor Ports                    Configuration Names
 Servo Ports
     0   LF - SPARK Mini        lf_drive
     1   Intake Servo           intake_servo
-    2   Wobble Lift Servo
-    3   Wobble Claw Servo
+    2   Wobble Lift Servo      wobble_lift
+    3   Wobble Claw Servo      wobble_claw
     4   Shooter Flipper Servo  shooterFlipper_servo
     5   Intake Latch Servo     intakeLatch_servo
