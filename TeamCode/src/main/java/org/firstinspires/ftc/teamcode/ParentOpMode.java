@@ -56,8 +56,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled
 public class ParentOpMode extends LinearOpMode {
 
-
-
     // Declare OpMode members.
     public ElapsedTime runtime = new ElapsedTime();
     private DcMotorSimple leftFront = null; //DcMotorSimple because it is connected to SPARK Mini
@@ -70,6 +68,7 @@ public class ParentOpMode extends LinearOpMode {
     private Servo intakeLatch = null;
     private Servo wobbleClaw = null;
     private Servo wobbleLift = null;
+    private Servo conveyor  = null;
 
     Toggle toggleClaw = new Toggle();
     Toggle toggleLift = new Toggle();
@@ -88,6 +87,7 @@ public class ParentOpMode extends LinearOpMode {
         intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
         wobbleClaw = hardwareMap.get(Servo.class, "wobble_claw");
         wobbleLift = hardwareMap.get(Servo.class, "wobble_lift");
+        conveyor = hardwareMap.get(Servo.class, "conveyor_servo");
 
 
         //Set Motor  and servo Directions
@@ -103,6 +103,8 @@ public class ParentOpMode extends LinearOpMode {
         intakeLatch.setDirection(Servo.Direction.FORWARD);
         wobbleClaw.setDirection(Servo.Direction.FORWARD);
         wobbleLift.setDirection(Servo.Direction.FORWARD);
+        conveyor.setDirection(Servo.Direction.FORWARD);
+
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //BRAKE or FLOAT (Coast)
@@ -156,6 +158,7 @@ public class ParentOpMode extends LinearOpMode {
         return gamepad1.right_stick_x;
     }
 
+
     //Buttons
 
     public boolean emergencyButtons(){
@@ -194,6 +197,15 @@ public class ParentOpMode extends LinearOpMode {
 
     public boolean intakeButton(){
         if((gamepad1.left_trigger>.5)||(gamepad2.left_trigger>.5)){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean outtakeButton(){
+        if(gamepad1.left_bumper||gamepad2.left_bumper){
             return true;
         }
         else{
@@ -325,11 +337,14 @@ public class ParentOpMode extends LinearOpMode {
 
     public void intake(){
         if(intakeButton()){
-            double speed = .5;
-            intakeServo.setPosition(speed);
+            double intakeServoSpeed = .5;
+            double conveyorServoSpeed = .5;
+            intakeServo.setPosition(intakeServoSpeed);         //continuous rotation servo - set speed using setPosition()
+            conveyor.setPosition(conveyorServoSpeed);
         }
         else{
             intakeServo.setPosition(0);
+            conveyor.setPosition(0);
         }
     }
 
@@ -359,8 +374,7 @@ public class ParentOpMode extends LinearOpMode {
     }
 
     //TODO:
-    // Additional intake wheels?, odometry/encoders
-    // Create opmodes for multiple drive types, convert FirstTimeProgrammingDrive to base class
+    // intake reverse, odometry/encoders
 
 }
 

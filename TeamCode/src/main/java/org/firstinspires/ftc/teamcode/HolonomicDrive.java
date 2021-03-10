@@ -53,7 +53,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name="Holonomic: Drive", group="Linear Opmode")
-
+//@Disabled
 public class HolonomicDrive extends ParentOpMode {
 
     @Override
