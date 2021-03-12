@@ -65,7 +65,7 @@ public class ParentOpMode extends LinearOpMode {
     private DcMotorEx shooterMotor = null;   //DcMotorEx offers extended capabilities such as setVelocity()
     private Servo intakeServo = null;
     private Servo shooterFlipper = null;
-    private Servo intakeLatch = null;
+    //private Servo intakeLatch = null;
     private Servo wobbleClaw = null;
     private Servo wobbleLift = null;
     private Servo conveyor  = null;
@@ -84,7 +84,7 @@ public class ParentOpMode extends LinearOpMode {
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter_motor");
         intakeServo = hardwareMap.get(Servo.class, "intake_servo");
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper_servo");
-        intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
+        //intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
         wobbleClaw = hardwareMap.get(Servo.class, "wobble_claw");
         wobbleLift = hardwareMap.get(Servo.class, "wobble_lift");
         conveyor = hardwareMap.get(Servo.class, "conveyor_servo");
@@ -100,7 +100,7 @@ public class ParentOpMode extends LinearOpMode {
 
         intakeServo.setDirection(Servo.Direction.FORWARD);
         shooterFlipper.setDirection(Servo.Direction.FORWARD);
-        intakeLatch.setDirection(Servo.Direction.FORWARD);
+        //intakeLatch.setDirection(Servo.Direction.FORWARD);
         wobbleClaw.setDirection(Servo.Direction.FORWARD);
         wobbleLift.setDirection(Servo.Direction.FORWARD);
         conveyor.setDirection(Servo.Direction.FORWARD);
@@ -123,7 +123,7 @@ public class ParentOpMode extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
-        releaseLatch();
+        //releaseLatch();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -336,15 +336,24 @@ public class ParentOpMode extends LinearOpMode {
 
 
     public void intake(){
+        double intakeServoSpeed = .5;
+        double conveyorServoSpeed = .5;
         if(intakeButton()){
-            double intakeServoSpeed = .5;
-            double conveyorServoSpeed = .5;
+
             intakeServo.setPosition(intakeServoSpeed);         //continuous rotation servo - set speed using setPosition()
             conveyor.setPosition(conveyorServoSpeed);
         }
         else{
-            intakeServo.setPosition(0);
-            conveyor.setPosition(0);
+            if (outtakeButton()){
+            intakeServo.setPosition(-intakeServoSpeed);
+            conveyor.setPosition(-conveyorServoSpeed);
+            }
+            else{
+                intakeServoSpeed = 0;
+                conveyorServoSpeed = 0;
+                intakeServo.setPosition(intakeServoSpeed);
+                conveyor.setPosition(conveyorServoSpeed);
+            }
         }
     }
 
@@ -366,15 +375,34 @@ public class ParentOpMode extends LinearOpMode {
         }
     }
 
+    public void shooterstart(double speed){
+        shooterMotor.setPower(speed);
+    }
+
+    public void shooterstop(){
+        shooterMotor.setPower(0);
+    }
+
+    public void shootauto(){
+        double shootPosition = .5;
+        double neutral = 0;
+        shooterFlipper.setPosition(shootPosition); //flip ring into shooter
+        //toggle shooter flipper back to neutral
+        //make neutral and shooter positions global variables?
+    }
+/*
     public void releaseLatch(){
         double releaseLatchPosition = .5;
 
         intakeLatch.setPosition(releaseLatchPosition);
 
     }
+*/
 
     //TODO:
-    // intake reverse, odometry/encoders
+    //  odometry/encoders
+    //  finish auto shooter functions
+    //
 
 }
 
