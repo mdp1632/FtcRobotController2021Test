@@ -358,16 +358,16 @@ public class ParentOpMode extends LinearOpMode {
     }
 
     public void shooter(){
-        double shootPosition = .5;
-        double neutral = 0;
-        double speed = 1;
+        double shootPosition = .5;  //flipper position
+        double neutralPosition = 0;
+        double shooterSpeed = 1;
 
         if(ShooterStartButton()){
-            shooterMotor.setPower(speed);
+            shooterMotor.setPower(shooterSpeed);
             if(shootButton()){
                 shooterFlipper.setPosition(shootPosition);
             }
-           else { shooterFlipper.setPosition(neutral);
+           else { shooterFlipper.setPosition(neutralPosition);
             }
         }
         else{
@@ -375,21 +375,22 @@ public class ParentOpMode extends LinearOpMode {
         }
     }
 
-    public void shooterstart(double speed){
+    public void shooterStart(double speed){
         shooterMotor.setPower(speed);
     }
 
-    public void shooterstop(){
+    public void shooterStop(){
         shooterMotor.setPower(0);
     }
 
-    public void shootauto(){
+    public void shootAuto(){
         double shootPosition = .5;
-        double neutral = 0;
+        double neutralPosition = 0;
         shooterFlipper.setPosition(shootPosition); //flip ring into shooter
         //toggle shooter flipper back to neutral
-        //make neutral and shooter positions global variables?
+        //make neutral and shooter positions global variables? incorporate shooterStart and shooterStop into shooter()?
     }
+
 /*
     public void releaseLatch(){
         double releaseLatchPosition = .5;
@@ -401,7 +402,7 @@ public class ParentOpMode extends LinearOpMode {
 
     //TODO:
     //  odometry/encoders
-    //  finish auto shooter functions
+    //  finish auto-shooter functions
     //
 
 }
