@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -65,10 +66,11 @@ public class ParentOpMode extends LinearOpMode {
     private DcMotorEx shooterMotor = null;   //DcMotorEx offers extended capabilities such as setVelocity()
     private Servo intakeServo = null;
     private Servo shooterFlipper = null;
-    //private Servo intakeLatch = null;
+    //private Servo intakeLatch = null;     //Intake Latch is hopefully not needed.
     private Servo wobbleClaw = null;
     private Servo wobbleLift = null;
     private Servo conveyor  = null;
+
 
     Toggle toggleClaw = new Toggle();
     Toggle toggleLift = new Toggle();
@@ -142,20 +144,20 @@ public class ParentOpMode extends LinearOpMode {
     //CONTROLLER MAP
     //Thumbsticks
 
-    public double left_sticky_y(){
-        return -gamepad1.left_stick_y;
-    }
-
-    public double right_sticky_y() {
-        return -gamepad1.right_stick_y;
-    }
-
     public double left_sticky_x(){
         return gamepad1.left_stick_x;
     }
 
+    public double left_sticky_y(){
+        return -gamepad1.left_stick_y;
+    }
+
     public double right_sticky_x() {
         return gamepad1.right_stick_x;
+    }
+
+    public double right_sticky_y() {
+        return -gamepad1.right_stick_y;
     }
 
 
@@ -256,18 +258,24 @@ public class ParentOpMode extends LinearOpMode {
 
 
         rotationSpeed = right_sticky_x()*.75;
-        robotSpeed = Math.hypot(left_sticky_y(), left_sticky_x());
+        robotSpeed = Math.hypot(left_sticky_x(), left_sticky_y());
         movementAngle = Math.atan2(left_sticky_y(), left_sticky_x());
+       // movementAngle = Math.atan2(left_sticky_y(), left_sticky_x()) + Math.toRadians(90);
 
-        double leftFrontSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) + rotationSpeed;
-        double rightFrontSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) - rotationSpeed;
-        double leftBackSpeed = robotSpeed*Math.sin(movementAngle + (Math.PI/4)) + rotationSpeed;
-        double rightBackSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) - rotationSpeed;
+        double leftFrontSpeed = (robotSpeed * Math.cos(movementAngle + (Math.PI / 4))) + rotationSpeed;
+        double rightFrontSpeed = (robotSpeed * Math.sin(movementAngle + (Math.PI / 4))) - rotationSpeed;
+        double leftBackSpeed = (robotSpeed*Math.sin(movementAngle + (Math.PI/4))) + rotationSpeed;
+        double rightBackSpeed = (robotSpeed*Math.cos(movementAngle + (Math.PI/4))) - rotationSpeed;
 
         leftFront.setPower(leftFrontSpeed);
         rightFront.setPower(rightFrontSpeed);
         leftBack.setPower(leftBackSpeed);
         rightBack.setPower(rightBackSpeed);
+
+        telemetry.addData("LF Speed:",leftFrontSpeed);
+        telemetry.addData("LB Speed:",leftBackSpeed);
+        telemetry.addData("RF Speed:",rightFrontSpeed);
+        telemetry.addData("RB Speed:",rightBackSpeed);
     }
 
 
@@ -299,6 +307,7 @@ public class ParentOpMode extends LinearOpMode {
             rightBack.setPower(0);
             intakeServo.setPosition(0);
             shooterMotor.setPower(0);
+            telemetry.addData("E-Stop:","Stopped by drivers.");
             return true;
         }
         else {
@@ -317,8 +326,10 @@ public class ParentOpMode extends LinearOpMode {
 
         if (clawClose) {
             wobbleClaw.setPosition(in);
+            telemetry.addData("Claw:", "Closed");
         } else {
             wobbleClaw.setPosition(out);
+            telemetry.addData("Claw:", "Open");
         }
     }
 
@@ -329,8 +340,10 @@ public class ParentOpMode extends LinearOpMode {
 
         if (liftDown) {
             wobbleLift.setPosition(down);
+            telemetry.addData("Wobble Lift:","Down");
         } else {
             wobbleLift.setPosition(up);
+            telemetry.addData("Wobble Lift:","Up");
         }
     }
 
@@ -338,21 +351,24 @@ public class ParentOpMode extends LinearOpMode {
     public void intake(){
         double intakeServoSpeed = .5;
         double conveyorServoSpeed = .5;
-        if(intakeButton()){
 
+        if(intakeButton()){
             intakeServo.setPosition(intakeServoSpeed);         //continuous rotation servo - set speed using setPosition()
             conveyor.setPosition(conveyorServoSpeed);
+            telemetry.addData("Intake:","IN");
         }
         else{
             if (outtakeButton()){
             intakeServo.setPosition(-intakeServoSpeed);
             conveyor.setPosition(-conveyorServoSpeed);
+                telemetry.addData("Intake:","OUT");
             }
             else{
                 intakeServoSpeed = 0;
                 conveyorServoSpeed = 0;
                 intakeServo.setPosition(intakeServoSpeed);
                 conveyor.setPosition(conveyorServoSpeed);
+                telemetry.addData("Intake:","Stopped");
             }
         }
     }
@@ -364,14 +380,17 @@ public class ParentOpMode extends LinearOpMode {
 
         if(ShooterStartButton()){
             shooterMotor.setPower(shooterSpeed);
+            telemetry.addData("Shooter:","Spinning");
             if(shootButton()){
                 shooterFlipper.setPosition(shootPosition);
+                telemetry.addData("Shooter:","FIRE");
             }
            else { shooterFlipper.setPosition(neutralPosition);
             }
         }
         else{
             shooterMotor.setPower(0);
+            telemetry.addData("Shooter:","Stopped");
         }
     }
 
