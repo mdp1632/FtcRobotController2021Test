@@ -71,9 +71,14 @@ public class HolonomicDrive extends ParentOpMode {
             holonomicDrive();
             intake();
             shooter();
+            lift();
+            claw();
             if(emergencyStop()){
                 break;
             }
+
+            //test telemetry
+            telemetry.addData("Left Trigger",gamepad1.left_trigger);
 
             telemetry.update();
         }

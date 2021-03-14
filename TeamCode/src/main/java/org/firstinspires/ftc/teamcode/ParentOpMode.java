@@ -29,15 +29,24 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.lynx.LynxController;
+import com.qualcomm.hardware.lynx.LynxDcMotorController;
+import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.hardware.lynx.LynxModuleIntf;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareDevice;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.configuration.LynxConstants;
 import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.internal.hardware.CachedLynxFirmwareVersions;
 
 
 /**
@@ -307,7 +316,6 @@ public class ParentOpMode extends LinearOpMode {
             rightBack.setPower(0);
             intakeServo.setPosition(0);
             shooterMotor.setPower(0);
-            telemetry.addData("E-Stop:","Stopped by drivers.");
             return true;
         }
         else {
@@ -353,7 +361,7 @@ public class ParentOpMode extends LinearOpMode {
         double conveyorServoSpeed = .5;
 
         if(intakeButton()){
-            intakeServo.setPosition(intakeServoSpeed);         //continuous rotation servo - set speed using setPosition()
+            intakeServo.setPosition(intakeServoSpeed);
             conveyor.setPosition(conveyorServoSpeed);
             telemetry.addData("Intake:","IN");
         }
@@ -385,7 +393,8 @@ public class ParentOpMode extends LinearOpMode {
                 shooterFlipper.setPosition(shootPosition);
                 telemetry.addData("Shooter:","FIRE");
             }
-           else { shooterFlipper.setPosition(neutralPosition);
+           else {
+               shooterFlipper.setPosition(neutralPosition);
             }
         }
         else{
@@ -418,6 +427,10 @@ public class ParentOpMode extends LinearOpMode {
 
     }
 */
+
+    public void currentTelemetry(){
+
+    }
 
     //TODO:
     //  odometry/encoders
