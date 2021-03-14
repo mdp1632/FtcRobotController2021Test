@@ -189,7 +189,7 @@ public class ParentOpMode extends LinearOpMode {
     }
 
     public boolean shootButton(){
-        if((gamepad1.right_trigger>.5)||(gamepad2.right_trigger>.5)){
+        if((gamepad1.right_trigger>.25)||(gamepad2.right_trigger>.25)){
             return true;
         }
         else{
@@ -207,7 +207,7 @@ public class ParentOpMode extends LinearOpMode {
     }
 
     public boolean intakeButton(){
-        if((gamepad1.left_trigger>.5)||(gamepad2.left_trigger>.5)){
+        if((gamepad1.left_trigger>.25)||(gamepad2.left_trigger>.25)){
             return true;
         }
         else{
