@@ -78,7 +78,7 @@ public class HolonomicDrive extends ParentOpMode {
             }
 
             //test telemetry
-            telemetry.addData("Left Trigger",gamepad1.left_trigger);
+            getCurrentTelemetry();
 
             telemetry.update();
         }

@@ -46,7 +46,10 @@ import com.qualcomm.robotcore.hardware.configuration.annotations.ServoType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.robotcore.internal.android.dex.util.ExceptionWithContext;
 import org.firstinspires.ftc.robotcore.internal.hardware.CachedLynxFirmwareVersions;
+
+import org.openftc.revextensions2.ExpansionHubEx;
 
 
 /**
@@ -80,6 +83,7 @@ public class ParentOpMode extends LinearOpMode {
     private Servo wobbleLift = null;
     private Servo conveyor  = null;
 
+    ExpansionHubEx expansionHub;    //use for rev extensions
 
     Toggle toggleClaw = new Toggle();
     Toggle toggleLift = new Toggle();
@@ -428,8 +432,27 @@ public class ParentOpMode extends LinearOpMode {
     }
 */
 
-    public void currentTelemetry(){
+    public void getCurrentTelemetry(){
+        try{
+            double totalCurrent = expansionHub.getTotalModuleCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS);
+            double motorCurrent0 = expansionHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS,0);
+            double motorCurrent1 = expansionHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS,1);
+            double motorCurrent2 = expansionHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS,2);
+            double motorCurrent3 = expansionHub.getMotorCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS,3);
+            double motorCurrentTotal = motorCurrent0 + motorCurrent1 + motorCurrent2 + motorCurrent3;
 
+            double ioCurrent = expansionHub.getGpioBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS);
+            double i2cCurrent = expansionHub.getI2cBusCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS);
+            double servoCurrent = totalCurrent-(motorCurrentTotal+ioCurrent+i2cCurrent); //calculate servo current (bug prevents getting current directly)
+
+            telemetry.addData("Total Current", "totalCurrent");
+            telemetry.addData("Motor Current", "motorCurrent");
+            telemetry.addData("Servo Current", "servoCurrent");
+            }
+        catch(Exception currentERROR){
+            telemetry.addData("Current Monitoring:", "N/A");
+            telemetry.addData("Current Monitoring:", currentERROR);
+        }
     }
 
     //TODO:

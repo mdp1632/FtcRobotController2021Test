@@ -57,7 +57,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
 
-        /**
+        /*
          * We keep the versionCode and versionName of robot controller applications in sync with
          * the master information published in the AndroidManifest.xml file of the FtcRobotController
          * module. This helps avoid confusion that might arise from having multiple versions of
@@ -69,6 +69,7 @@ android {
          * @see <a href="http://developer.android.com/tools/building/configuring-gradle.html">Configure Your Build</a>
          * @see <a href="http://developer.android.com/tools/publishing/versioning.html">Versioning Your App</a>
          */
+
         def manifestFile = project(':FtcRobotController').file('src/main/AndroidManifest.xml');
         def manifestText = manifestFile.getText()
         //
@@ -122,5 +123,6 @@ repositories {
     flatDir {
         dirs rootProject.file('libs')
     }
+    jcenter()
 }
 
