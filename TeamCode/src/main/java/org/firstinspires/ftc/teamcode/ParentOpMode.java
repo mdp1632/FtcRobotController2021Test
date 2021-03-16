@@ -36,6 +36,7 @@ import com.qualcomm.hardware.lynx.LynxModuleIntf;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -76,12 +77,12 @@ public class ParentOpMode extends LinearOpMode {
     private DcMotor rightFront = null;
     private DcMotor rightBack = null;
     private DcMotorEx shooterMotor = null;   //DcMotorEx offers extended capabilities such as setVelocity()
-    private Servo intakeServo = null;
+    private CRServo intakeServo = null;
     private Servo shooterFlipper = null;
-    //private Servo intakeLatch = null;     //Intake Latch is hopefully not needed.
+    //private Servo intakeLatch = null;     //Intake Latch is hopefully not needed. No more ports :(
     private Servo wobbleClaw = null;
     private Servo wobbleLift = null;
-    private Servo conveyor  = null;
+    private CRServo conveyor  = null;
 
     ExpansionHubEx expansionHub;    //use for rev extensions
 
@@ -97,12 +98,12 @@ public class ParentOpMode extends LinearOpMode {
         leftBack  = hardwareMap.get(DcMotor.class, "lb_drive");
         rightBack = hardwareMap.get(DcMotor.class, "rb_drive");
         shooterMotor = hardwareMap.get(DcMotorEx.class, "shooter_motor");
-        intakeServo = hardwareMap.get(Servo.class, "intake_servo");
+        intakeServo = hardwareMap.get(CRServo.class, "intake_servo");
         shooterFlipper = hardwareMap.get(Servo.class,"shooterFlipper_servo");
         //intakeLatch = hardwareMap.get(Servo.class,"intakeLatch_servo");
         wobbleClaw = hardwareMap.get(Servo.class, "wobble_claw");
         wobbleLift = hardwareMap.get(Servo.class, "wobble_lift");
-        conveyor = hardwareMap.get(Servo.class, "conveyor_servo");
+        conveyor = hardwareMap.get(CRServo.class, "conveyor_servo");
 
 
         //Set Motor  and servo Directions
@@ -113,12 +114,12 @@ public class ParentOpMode extends LinearOpMode {
 
         shooterMotor.setDirection(DcMotorEx.Direction.FORWARD);
 
-        intakeServo.setDirection(Servo.Direction.FORWARD);
-        shooterFlipper.setDirection(Servo.Direction.FORWARD);
+        intakeServo.setDirection(CRServo.Direction.FORWARD);
+        shooterFlipper.setDirection(Servo.Direction.REVERSE);
         //intakeLatch.setDirection(Servo.Direction.FORWARD);
         wobbleClaw.setDirection(Servo.Direction.FORWARD);
         wobbleLift.setDirection(Servo.Direction.FORWARD);
-        conveyor.setDirection(Servo.Direction.FORWARD);
+        conveyor.setDirection(CRServo.Direction.FORWARD);
 
 
         //Set brake or coast modes. Drive motors should match SPARK Mini switch
@@ -129,6 +130,7 @@ public class ParentOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
+
 
     @Override
     public void runOpMode() {
@@ -156,7 +158,6 @@ public class ParentOpMode extends LinearOpMode {
 
     //CONTROLLER MAP
     //Thumbsticks
-
     public double left_sticky_x(){
         return gamepad1.left_stick_x;
     }
@@ -173,9 +174,7 @@ public class ParentOpMode extends LinearOpMode {
         return -gamepad1.right_stick_y;
     }
 
-
     //Buttons
-
     public boolean emergencyButtons(){
         if(((gamepad1.y)&&(gamepad1.b))||((gamepad2.y)&&(gamepad2.b))){
             return true; }
@@ -272,8 +271,8 @@ public class ParentOpMode extends LinearOpMode {
 
         rotationSpeed = right_sticky_x()*.75;
         robotSpeed = Math.hypot(left_sticky_x(), left_sticky_y());
-        movementAngle = Math.atan2(left_sticky_y(), left_sticky_x());
-       // movementAngle = Math.atan2(left_sticky_y(), left_sticky_x()) + Math.toRadians(90);
+      //  movementAngle = Math.atan2(left_sticky_y(), left_sticky_x());
+        movementAngle = Math.atan2(left_sticky_y(), left_sticky_x()) + Math.toRadians(-90);
 
         double leftFrontSpeed = (robotSpeed * Math.cos(movementAngle + (Math.PI / 4))) + rotationSpeed;
         double rightFrontSpeed = (robotSpeed * Math.sin(movementAngle + (Math.PI / 4))) - rotationSpeed;
@@ -318,7 +317,7 @@ public class ParentOpMode extends LinearOpMode {
             rightFront.setPower(0);
             leftBack.setPower(0);
             rightBack.setPower(0);
-            intakeServo.setPosition(0);
+            intakeServo.setPower(0);
             shooterMotor.setPower(0);
             return true;
         }
@@ -365,21 +364,21 @@ public class ParentOpMode extends LinearOpMode {
         double conveyorServoSpeed = .5;
 
         if(intakeButton()){
-            intakeServo.setPosition(intakeServoSpeed);
-            conveyor.setPosition(conveyorServoSpeed);
+            intakeServo.setPower(intakeServoSpeed);
+            conveyor.setPower(conveyorServoSpeed);
             telemetry.addData("Intake:","IN");
         }
         else{
             if (outtakeButton()){
-            intakeServo.setPosition(-intakeServoSpeed);
-            conveyor.setPosition(-conveyorServoSpeed);
+            intakeServo.setPower(-intakeServoSpeed);
+            conveyor.setPower(-conveyorServoSpeed);
                 telemetry.addData("Intake:","OUT");
             }
             else{
                 intakeServoSpeed = 0;
                 conveyorServoSpeed = 0;
-                intakeServo.setPosition(intakeServoSpeed);
-                conveyor.setPosition(conveyorServoSpeed);
+                intakeServo.setPower(intakeServoSpeed);
+                conveyor.setPower(conveyorServoSpeed);
                 telemetry.addData("Intake:","Stopped");
             }
         }
@@ -458,7 +457,12 @@ public class ParentOpMode extends LinearOpMode {
     //TODO:
     //  odometry/encoders
     //  finish auto-shooter functions
+    //  correct issues found during robot testing
+    //      -wobble lift may be binding or potentially trying to pull too much current?
+    //      -wobble claw - works, but toggles need debouncing
     //
+
+
 
 }
 
