@@ -225,30 +225,5 @@ public class EasyOpenCVCopy extends LinearOpModeBase //originally LinearOpMode; 
         }
     }
 
-    /*
-    public class toggleBoi{
-        private boolean oldState;
-        private boolean ON;
-
-        public boolean toggle(boolean newState){
-            if(newState && oldState){
-                if(!ON){
-                    ON = true;
-                    oldState = newState;
-                    return true;
-                }
-                else{
-                    ON = false;
-                    oldState = newState;
-                    return false;
-                }
-            }
-            else{
-                return false;
-            }
-        }
-
-    }
-   */
 
 }

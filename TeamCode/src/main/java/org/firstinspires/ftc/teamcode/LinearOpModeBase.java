@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -37,6 +38,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
 /**
@@ -70,7 +76,12 @@ public class LinearOpModeBase extends LinearOpMode {
     private Servo wobbleLift = null;
     private Servo conveyor  = null;
 
+    //Gyro Stuff
+    private BNO055IMU imu;
+    private Orientation lastAngles = new Orientation ();
+    private double heading;
 
+    //Toggles
     ToggleMdP toggleClaw = new ToggleMdP();
     ToggleMdP toggleLift = new ToggleMdP();
 
@@ -133,6 +144,8 @@ public class LinearOpModeBase extends LinearOpMode {
         return gamepad1.right_stick_x*scalingFactor;
     }
 
+
+    //other methods
     public void holonomicDriveAuto(double robotSpeed, double movementAngle, double rotationSpeed){
 
         double leftFrontSpeed = robotSpeed*Math.cos(movementAngle + (Math.PI/4)) + rotationSpeed;
@@ -154,8 +167,40 @@ public class LinearOpModeBase extends LinearOpMode {
     }
     */
 
-    public double getAngle(){
-        return 0; //replace with angle from gyro
+    private void imuInit() {
+        //begin imu init code
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode               = BNO055IMU.SensorMode.GYRONLY;   //May be faster, if it works
+        //parameters.mode               = BNO055IMU.SensorMode.IMU; // Used in 2020
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled      = false;
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        while (!isStopRequested() && !imu.isGyroCalibrated()){
+            sleep(50);
+            idle();
+        }
+        //end imu init code
+    }
+
+    /**
+     * Resets the cumulative angle tracking to zero.
+     */
+    private void resetAngle(){
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        heading = 0;
+    }
+
+    public double getAngle() {
+        // Z axis is returned as 0 to +180 or 0 to -180 rolling to -179 or +179 when passing 180
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        heading = angles.firstAngle;
+        return heading;
     }
 
     public void driveTankAuto(double leftSpeed, double rightSpeed){
@@ -168,13 +213,13 @@ public class LinearOpModeBase extends LinearOpMode {
 
     public void driveStraight(double targetDistance, double speed){
         double startAngle = getAngle();
-        double currentAngle = startAngle;
+        double currentAngle;
         double currentDistance = 0;
         double leftSpeed = speed;
         double rightSpeed = speed;
 
-        double hysteresis = 2; //minimum angle to correct for
-        double correctionConstant = 5;
+        double hysteresis = 2;  //minimum angle to correct for
+        double correctionConstant = 0.15;
 
         while(currentDistance < targetDistance){
             currentAngle = getAngle();
@@ -186,6 +231,53 @@ public class LinearOpModeBase extends LinearOpMode {
             else if(currentAngle < (startAngle - hysteresis)){  //if turning right, correct by turning left
                 leftSpeed = speed - correctionConstant;
                 rightSpeed = speed + correctionConstant;
+            }
+            else{
+                leftSpeed = speed;
+                rightSpeed = speed;
+            }
+
+            driveTankAuto(leftSpeed,rightSpeed);
+
+            currentDistance = 0; //replace with value from encoder calculations
+        }
+
+        stopDriveMotors();
+
+    }
+
+    public void driveStraightTwoStage(double targetDistance, double speed){
+        double startAngle = getAngle();
+        double currentAngle;
+        double currentDistance = 0;
+        double leftSpeed = speed;
+        double rightSpeed = speed;
+
+        double hysteresis = 2; //minimum angle to correct for
+        double correctionConstant = 0.15;
+        double correctionVariable = correctionConstant;
+        double correctionScaler = 1.5;
+
+        while(currentDistance < targetDistance){
+            currentAngle = getAngle();
+
+            if(currentAngle > (startAngle + hysteresis)){                       //if turning left, correct by turning right
+
+                if(currentAngle > (startAngle + (hysteresis * 2))){             //if turning extra hard, compensate by drive ones side even faster
+                    correctionVariable = correctionConstant * correctionScaler;
+                }
+
+                leftSpeed = speed + correctionVariable;
+                rightSpeed = speed - correctionVariable;
+            }
+            else if(currentAngle < (startAngle - hysteresis)){                  //if turning right, correct by turning left
+
+                if(currentAngle > (startAngle - (hysteresis * 2))){             //if turning extra hard, compensate by drive ones side even faster
+                    correctionVariable = correctionConstant * correctionScaler;
+                }
+
+                leftSpeed = speed - correctionVariable;
+                rightSpeed = speed + correctionVariable;
             }
             else{
                 leftSpeed = speed;
